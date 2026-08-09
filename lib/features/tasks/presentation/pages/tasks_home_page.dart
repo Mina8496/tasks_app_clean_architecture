@@ -10,9 +10,10 @@ class TasksHomePage extends StatefulWidget {
 
 class _TasksHomePageState extends State<TasksHomePage> {
   int currentIndex = 0;
+  late Database database;
 
   void createDatabase() async {
-    Database database = await openDatabase(
+    database = await openDatabase(
       'tasks.db',
       version: 1,
       onCreate: (db, version) {
@@ -35,7 +36,19 @@ class _TasksHomePageState extends State<TasksHomePage> {
   }
 
   void insertToDatabase() {
-    // UI only
+    database.transaction((txn) {
+      txn
+          .rawInsert(
+            'INSERT INTO tasks(title, data, time, status) VALUES("First Task", "Task Data", "12:00", "new")',
+          )
+          .then((value) {
+            print("$value inserted successfully");
+          })
+          .catchError((error) {
+            print("Error when inserting new record ${error.toString()}");
+          });
+      return Future.value();
+    });
   }
 
   @override
@@ -86,7 +99,7 @@ class _TasksHomePageState extends State<TasksHomePage> {
       // --------------------------------------------------
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // UI only
+          insertToDatabase();
         },
 
         backgroundColor: Colors.blue,

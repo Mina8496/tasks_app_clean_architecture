@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:tasks_app_clean_architecture/features/tasks/presentation/widgets/default_From_Text_Feild.dart';
 
 class TasksHomePage extends StatefulWidget {
   const TasksHomePage({super.key});
@@ -11,6 +13,14 @@ class TasksHomePage extends StatefulWidget {
 class _TasksHomePageState extends State<TasksHomePage> {
   int currentIndex = 0;
   late Database database;
+
+  var scaffoldKey = GlobalKey<ScaffoldState>();
+  var formKey = GlobalKey<FormState>();
+  bool isBottomSheetShown = false;
+  IconData fabIcon = Icons.edit;
+  var titleController = TextEditingController();
+  var dataController = TextEditingController();
+  var timeController = TextEditingController();
 
   void createDatabase() async {
     database = await openDatabase(
@@ -35,11 +45,15 @@ class _TasksHomePageState extends State<TasksHomePage> {
     );
   }
 
-  void insertToDatabase() {
-    database.transaction((txn) {
+  Future insertToDatabase({
+    required String title,
+    required String data,
+    required String time,
+  }) async {
+    return await database.transaction((txn) {
       txn
           .rawInsert(
-            'INSERT INTO tasks(title, data, time, status) VALUES("First Task", "Task Data", "12:00", "new")',
+            'INSERT INTO tasks(title, data, time, status) VALUES("$title", "$data", "$time", "new")',
           )
           .then((value) {
             print("$value inserted successfully");
@@ -60,6 +74,7 @@ class _TasksHomePageState extends State<TasksHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
       backgroundColor: const Color(0xFFFAFCFA),
 
       // --------------------------------------------------
@@ -99,7 +114,105 @@ class _TasksHomePageState extends State<TasksHomePage> {
       // --------------------------------------------------
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          insertToDatabase();
+          if (isBottomSheetShown) {
+            if (formKey.currentState!.validate()) {
+              insertToDatabase(
+                    title: titleController.text,
+                    data: dataController.text,
+                    time: timeController.text,
+                  )
+                  .then((value) {
+                    Navigator.pop(context);
+                    isBottomSheetShown = false;
+                    setState(() {
+                      fabIcon = Icons.edit;
+                    });
+                  })
+                  .catchError((error) {
+                    print(
+                      "Error when inserting new record ${error.toString()}",
+                    );
+                  });
+            }
+          } else {
+            scaffoldKey.currentState?.showBottomSheet(
+              (context) => Container(
+                color: Colors.grey[100],
+                padding: const EdgeInsets.all(20),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      DefaultFromTextFeild(
+                        labelText: 'Task title',
+                        controller: titleController,
+                        keyboardType: TextInputType.text,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter a task name';
+                          }
+                          return null;
+                        },
+                      ),
+                      SizedBox(height: 10),
+                      DefaultFromTextFeild(
+                        labelText: 'Task Data',
+                        controller: dataController,
+                        keyboardType: TextInputType.text,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter task data';
+                          }
+                          return null;
+                        },
+                        onTap: () {
+                          showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime.now(),
+                            lastDate: DateTime(2100),
+                          ).then((value) {
+                            print(DateFormat.yMMMd().format(value!));
+                            dataController.text = value.toString().split(
+                              ' ',
+                            )[0];
+                          });
+                        },
+                      ),
+
+                      SizedBox(height: 10),
+                      DefaultFromTextFeild(
+                        labelText: 'Task time',
+                        controller: timeController,
+                        keyboardType: TextInputType.text,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter task time';
+                          }
+                          return null;
+                        },
+                        onTap: () {
+                          showTimePicker(
+                            context: context,
+                            initialTime: TimeOfDay.now(),
+                          ).then((value) {
+                            timeController.text = value!
+                                .format(context)
+                                .toString();
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+            isBottomSheetShown = true;
+            setState(() {
+              fabIcon = Icons.add;
+            });
+          }
         },
 
         backgroundColor: Colors.blue,
@@ -108,7 +221,7 @@ class _TasksHomePageState extends State<TasksHomePage> {
 
         shape: const CircleBorder(),
 
-        child: const Icon(Icons.add, size: 30),
+        child: Icon(fabIcon, size: 30),
       ),
 
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,

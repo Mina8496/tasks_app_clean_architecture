@@ -1,6 +1,11 @@
+import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:tasks_app_clean_architecture/core/constant/constants.dart';
+import 'package:tasks_app_clean_architecture/features/tasks/presentation/pages/New_Tasks_page.dart';
+import 'package:tasks_app_clean_architecture/features/tasks/presentation/pages/archived_tasks_page.dart';
+import 'package:tasks_app_clean_architecture/features/tasks/presentation/pages/done_tasks_page.dart';
 import 'package:tasks_app_clean_architecture/features/tasks/presentation/widgets/default_From_Text_Feild.dart';
 
 class TasksHomePage extends StatefulWidget {
@@ -11,6 +16,10 @@ class TasksHomePage extends StatefulWidget {
 }
 
 class _TasksHomePageState extends State<TasksHomePage> {
+  List<Widget> screens = [NewTasksPage(), DoneTasksPage(), ArchivedTasksPage()];
+
+  List<String> titles = ['New Tasks', 'Done Tasks', 'Archived Tasks'];
+
   int currentIndex = 0;
   late Database database;
 
@@ -40,6 +49,10 @@ class _TasksHomePageState extends State<TasksHomePage> {
             });
       },
       onOpen: (db) {
+        GetDataFromDatabase(db).then((value) {
+          tasks = value;
+          print(tasks);
+        });
         print('Database opened');
       },
     );
@@ -63,6 +76,10 @@ class _TasksHomePageState extends State<TasksHomePage> {
           });
       return Future.value();
     });
+  }
+
+  Future<List<Map>> GetDataFromDatabase(db) async {
+    return await db.rawQuery('SELECT * FROM tasks');
   }
 
   @override
@@ -98,15 +115,10 @@ class _TasksHomePageState extends State<TasksHomePage> {
       // --------------------------------------------------
       // BODY
       // --------------------------------------------------
-      body: const Center(
-        child: Text(
-          'New Tasks',
-          style: TextStyle(
-            color: Color(0xFF202124),
-            fontSize: 27,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+      body: ConditionalBuilder(
+        condition: tasks.isNotEmpty,
+        builder: (context) => screens[currentIndex],
+        fallback: (context) => const Center(child: CircularProgressIndicator()),
       ),
 
       // --------------------------------------------------
@@ -122,10 +134,15 @@ class _TasksHomePageState extends State<TasksHomePage> {
                     time: timeController.text,
                   )
                   .then((value) {
-                    Navigator.pop(context);
-                    isBottomSheetShown = false;
-                    setState(() {
-                      fabIcon = Icons.edit;
+                    GetDataFromDatabase(database).then((value) {
+                      Navigator.pop(context);
+
+                      setState(() {
+                        tasks = value;
+                        print(tasks);
+                        isBottomSheetShown = false;
+                        fabIcon = Icons.edit;
+                      });
                     });
                   })
                   .catchError((error) {
@@ -135,79 +152,87 @@ class _TasksHomePageState extends State<TasksHomePage> {
                   });
             }
           } else {
-            scaffoldKey.currentState?.showBottomSheet(
-              (context) => Container(
-                color: Colors.grey[100],
-                padding: const EdgeInsets.all(20),
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      DefaultFromTextFeild(
-                        labelText: 'Task title',
-                        controller: titleController,
-                        keyboardType: TextInputType.text,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a task name';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 10),
-                      DefaultFromTextFeild(
-                        labelText: 'Task Data',
-                        controller: dataController,
-                        keyboardType: TextInputType.text,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter task data';
-                          }
-                          return null;
-                        },
-                        onTap: () {
-                          showDatePicker(
-                            context: context,
-                            initialDate: DateTime.now(),
-                            firstDate: DateTime.now(),
-                            lastDate: DateTime(2100),
-                          ).then((value) {
-                            print(DateFormat.yMMMd().format(value!));
-                            dataController.text = value.toString().split(
-                              ' ',
-                            )[0];
-                          });
-                        },
-                      ),
+            scaffoldKey.currentState
+                ?.showBottomSheet(
+                  (context) => Container(
+                    color: Colors.grey[100],
+                    padding: const EdgeInsets.all(20),
+                    child: Form(
+                      key: formKey,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          DefaultFromTextFeild(
+                            labelText: 'Task title',
+                            controller: titleController,
+                            keyboardType: TextInputType.text,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter a task name';
+                              }
+                              return null;
+                            },
+                          ),
+                          SizedBox(height: 10),
+                          DefaultFromTextFeild(
+                            labelText: 'Task Data',
+                            controller: dataController,
+                            keyboardType: TextInputType.text,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter task data';
+                              }
+                              return null;
+                            },
+                            onTap: () {
+                              showDatePicker(
+                                context: context,
+                                initialDate: DateTime.now(),
+                                firstDate: DateTime.now(),
+                                lastDate: DateTime(2100),
+                              ).then((value) {
+                                print(DateFormat.yMMMd().format(value!));
+                                dataController.text = value.toString().split(
+                                  ' ',
+                                )[0];
+                              });
+                            },
+                          ),
 
-                      SizedBox(height: 10),
-                      DefaultFromTextFeild(
-                        labelText: 'Task time',
-                        controller: timeController,
-                        keyboardType: TextInputType.text,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter task time';
-                          }
-                          return null;
-                        },
-                        onTap: () {
-                          showTimePicker(
-                            context: context,
-                            initialTime: TimeOfDay.now(),
-                          ).then((value) {
-                            timeController.text = value!
-                                .format(context)
-                                .toString();
-                          });
-                        },
+                          SizedBox(height: 10),
+                          DefaultFromTextFeild(
+                            labelText: 'Task time',
+                            controller: timeController,
+                            keyboardType: TextInputType.text,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter task time';
+                              }
+                              return null;
+                            },
+                            onTap: () {
+                              showTimePicker(
+                                context: context,
+                                initialTime: TimeOfDay.now(),
+                              ).then((value) {
+                                timeController.text = value!
+                                    .format(context)
+                                    .toString();
+                              });
+                            },
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-            );
+                )
+                .closed
+                .then(((value) {
+                  isBottomSheetShown = false;
+                  setState(() {
+                    fabIcon = Icons.edit;
+                  });
+                }));
             isBottomSheetShown = true;
             setState(() {
               fabIcon = Icons.add;

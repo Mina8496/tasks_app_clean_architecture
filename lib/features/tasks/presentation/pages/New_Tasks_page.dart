@@ -7,11 +7,12 @@ class NewTasksPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      itemBuilder: (context, index) => BuildTasksItem(tasks: tasks[index]),
-      separatorBuilder: (context, index) =>
-          const Divider(color: Colors.grey, thickness: 1),
-      itemCount: tasks.length,
-    );
+    return Container();
+    // ListView.separated(
+    //   itemBuilder: (context, index) => BuildTasksItem(tasks: tasks[index]),
+    //   separatorBuilder: (context, index) =>
+    //       const Divider(color: Colors.grey, thickness: 1),
+    //   itemCount: tasks.length,
+    // );
   }
 }

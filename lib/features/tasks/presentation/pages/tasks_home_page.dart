@@ -21,7 +21,11 @@ class TasksHomePage extends StatelessWidget {
     return BlocProvider(
       create: (context) => TasksCubit()..createDatabase(),
       child: BlocConsumer<TasksCubit, TasksState>(
-        listener: (context, state) {},
+        listener: (context, state) {
+          if (state is InsertTaskState) {
+            Navigator.pop(context);
+          }
+        },
         builder: (context, state) {
           TasksCubit cubit = TasksCubit.get(context);
 
@@ -51,7 +55,7 @@ class TasksHomePage extends StatelessWidget {
             // BODY
             // --------------------------------------------------
             body: ConditionalBuilder(
-              condition: true, // tasks.isNotEmpty,
+              condition: TasksCubit.get(context).tasks.isNotEmpty,
               builder: (context) => TasksCubit.get(
                 context,
               ).screens[TasksCubit.get(context).currentIndex],
@@ -66,27 +70,11 @@ class TasksHomePage extends StatelessWidget {
               onPressed: () {
                 if (cubit.isBottomSheetShown) {
                   if (formKey.currentState!.validate()) {
-                    // insertToDatabase(
-                    //       title: titleController.text,
-                    //       data: dataController.text,
-                    //       time: timeController.text,
-                    //     )
-                    //     .then((value) {
-                    //       GetDataFromDatabase(database).then((value) {
-                    //         Navigator.pop(context);
-                    // setState(() {
-                    //   tasks = value;
-                    //   print(tasks);
-                    //   isBottomSheetShown = fal se;
-                    //   fabIcon = Icons.edit;
-                    // });
-                    // });
-                    // })
-                    // .catchError((error) {
-                    //   print(
-                    //     "Error when inserting new record ${error.toString()}",
-                    //   );
-                    // });
+                    cubit.insertToDatabase(
+                      title: titleController.text,
+                      data: dataController.text,
+                      time: timeController.text,
+                    );
                   }
                 } else {
                   scaffoldKey.currentState

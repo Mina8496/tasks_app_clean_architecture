@@ -56,7 +56,7 @@ class TasksCubit extends Cubit<TasksState> {
     });
   }
 
-  Future insertToDatabase({
+  insertToDatabase({
     required String title,
     required String data,
     required String time,
@@ -69,6 +69,10 @@ class TasksCubit extends Cubit<TasksState> {
           .then((value) {
             emit(InsertTaskState());
             print("$value inserted successfully");
+            GetDataFromDatabase(database).then((value) {
+              tasks = value;
+              emit(GetTasksState());
+            });
           })
           .catchError((error) {
             print("Error when inserting new record ${error.toString()}");

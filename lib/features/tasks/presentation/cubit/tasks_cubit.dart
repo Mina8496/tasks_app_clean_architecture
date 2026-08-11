@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sqflite/sqflite.dart';
@@ -23,7 +25,9 @@ class TasksCubit extends Cubit<TasksState> {
   }
 
   late Database database;
-  List<Map> tasks = [];
+  List<Map> newtasks = [];
+  List<Map> donetasks = [];
+  List<Map> archivedtasks = [];
 
   void createDatabase() {
     openDatabase(
@@ -43,11 +47,7 @@ class TasksCubit extends Cubit<TasksState> {
             });
       },
       onOpen: (database) {
-        GetDataFromDatabase(database).then((value) {
-          tasks = value;
-          emit(GetTasksState());
-          print(tasks);
-        });
+        GetDataFromDatabase(database);
         print('Database opened');
       },
     ).then((value) {
@@ -69,10 +69,7 @@ class TasksCubit extends Cubit<TasksState> {
           .then((value) {
             emit(InsertTaskState());
             print("$value inserted successfully");
-            GetDataFromDatabase(database).then((value) {
-              tasks = value;
-              emit(GetTasksState());
-            });
+            GetDataFromDatabase(database);
           })
           .catchError((error) {
             print("Error when inserting new record ${error.toString()}");
@@ -81,8 +78,31 @@ class TasksCubit extends Cubit<TasksState> {
     });
   }
 
-  Future<List<Map>> GetDataFromDatabase(database) async {
-    return await database.rawQuery('SELECT * FROM tasks');
+  void GetDataFromDatabase(database) {
+    newtasks = [];
+    donetasks = [];
+    archivedtasks = [];
+    database.rawQuery('SELECT * FROM tasks').then((value) {
+      value.forEach((element) {
+        if (element['status'] == 'new') {
+          newtasks.add(element);
+        } else if (element['status'] == 'done') {
+          donetasks.add(element);
+        } else if (element['status'] == 'archived') {
+          archivedtasks.add(element);
+        }
+      });
+      emit(GetTasksState());
+    });
+  }
+
+  void updateData({required String status, required int id}) async {
+    database
+        .rawUpdate('UPDATE tasks SET status = ? WHERE id = ?', ['$status', id])
+        .then((value) {
+          GetDataFromDatabase(database);
+          emit(UpdateTasksState());
+        });
   }
 
   bool isBottomSheetShown = false;

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tasks_app_clean_architecture/features/tasks/presentation/cubit/tasks_cubit.dart';
 
 class BuildTasksItem extends StatelessWidget {
   final Map tasks;
@@ -19,23 +20,42 @@ class BuildTasksItem extends StatelessWidget {
             ),
           ),
           SizedBox(width: 20),
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '${tasks['title']}',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+          Expanded(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${tasks['title']}',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
-              Text(
-                '${tasks['data']}',
-                style: TextStyle(color: Colors.grey, fontSize: 16),
-              ),
-            ],
+                Text(
+                  '${tasks['data']}',
+                  style: TextStyle(color: Colors.grey, fontSize: 16),
+                ),
+                SizedBox(width: 20),
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: () {
+              TasksCubit.get(
+                context,
+              ).updateData(status: 'done', id: tasks['id']);
+            },
+            icon: Icon(Icons.check_box, color: Colors.green),
+          ),
+          IconButton(
+            onPressed: () {
+              TasksCubit.get(
+                context,
+              ).updateData(status: 'archived', id: tasks['id']);
+            },
+            icon: Icon(Icons.archive, color: Colors.black45),
           ),
         ],
       ),

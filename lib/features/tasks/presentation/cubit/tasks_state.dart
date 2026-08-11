@@ -9,5 +9,6 @@ class CreateTaskState extends TasksState {}
 class InsertTaskState extends TasksState {}
 
 class GetTasksState extends TasksState {}
+class UpdateTasksState extends TasksState {}
 
 class ChangeBottomSheetState extends TasksState {}

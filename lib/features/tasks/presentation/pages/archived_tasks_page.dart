@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tasks_app_clean_architecture/features/tasks/presentation/cubit/tasks_cubit.dart';
+import 'package:tasks_app_clean_architecture/features/tasks/presentation/cubit/tasks_state.dart';
+import 'package:tasks_app_clean_architecture/features/tasks/presentation/widgets/build_tasks_Item.dart';
 
 class ArchivedTasksPage extends StatelessWidget {
   const ArchivedTasksPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Archived Tasks',
-        style: TextStyle(
-          color: Color(0xFF202124),
-          fontSize: 27,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
+    return BlocConsumer<TasksCubit, TasksState>(
+      listener: (context, state) {},
+      builder: (context, state) {
+        var tasks = TasksCubit.get(context).archivedtasks;
+        return ListView.separated(
+          itemBuilder: (context, index) => BuildTasksItem(tasks: tasks[index]),
+          separatorBuilder: (context, index) =>
+              const Divider(color: Colors.grey, thickness: 1),
+          itemCount: tasks.length,
+        );
+      },
     );
   }
 }

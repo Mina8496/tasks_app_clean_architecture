@@ -12,7 +12,7 @@ class NewTasksPage extends StatelessWidget {
     return BlocConsumer<TasksCubit, TasksState>(
       listener: (context, state) {},
       builder: (context, state) {
-        var tasks = TasksCubit.get(context).tasks;
+        var tasks = TasksCubit.get(context).newtasks;
         return ListView.separated(
           itemBuilder: (context, index) => BuildTasksItem(tasks: tasks[index]),
           separatorBuilder: (context, index) =>

@@ -55,7 +55,7 @@ class TasksHomePage extends StatelessWidget {
             // BODY
             // --------------------------------------------------
             body: ConditionalBuilder(
-              condition: TasksCubit.get(context).tasks.isNotEmpty,
+              condition: TasksCubit.get(context).newtasks.isNotEmpty,
               builder: (context) => TasksCubit.get(
                 context,
               ).screens[TasksCubit.get(context).currentIndex],

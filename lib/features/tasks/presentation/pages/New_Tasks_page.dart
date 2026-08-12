@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tasks_app_clean_architecture/features/tasks/presentation/cubit/tasks_cubit.dart';
 import 'package:tasks_app_clean_architecture/features/tasks/presentation/cubit/tasks_state.dart';
-import 'package:tasks_app_clean_architecture/features/tasks/presentation/widgets/build_tasks_Item.dart';
+import 'package:tasks_app_clean_architecture/features/tasks/presentation/widgets/tasks_builder.dart';
 
 class NewTasksPage extends StatelessWidget {
   const NewTasksPage({super.key});
@@ -12,13 +12,8 @@ class NewTasksPage extends StatelessWidget {
     return BlocConsumer<TasksCubit, TasksState>(
       listener: (context, state) {},
       builder: (context, state) {
-        var tasks = TasksCubit.get(context).newtasks;
-        return ListView.separated(
-          itemBuilder: (context, index) => BuildTasksItem(tasks: tasks[index]),
-          separatorBuilder: (context, index) =>
-              const Divider(color: Colors.grey, thickness: 1),
-          itemCount: tasks.length,
-        );
+        final tasks = TasksCubit.get(context).newtasks;
+        return TasksBuilder(tasks: tasks);
       },
     );
   }

@@ -1,12 +1,7 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:tasks_app_clean_architecture/features/tasks/presentation/cubit/tasks_state.dart';
-import 'package:tasks_app_clean_architecture/features/tasks/presentation/pages/New_Tasks_page.dart';
-import 'package:tasks_app_clean_architecture/features/tasks/presentation/pages/archived_tasks_page.dart';
-import 'package:tasks_app_clean_architecture/features/tasks/presentation/pages/done_tasks_page.dart';
 
 class TasksCubit extends Cubit<TasksState> {
   TasksCubit() : super(TasksInitial());
@@ -14,10 +9,6 @@ class TasksCubit extends Cubit<TasksState> {
   static TasksCubit get(context) => BlocProvider.of(context);
 
   int currentIndex = 0;
-
-  List<Widget> screens = [NewTasksPage(), DoneTasksPage(), ArchivedTasksPage()];
-
-  List<String> titles = ['New Tasks', 'Done Tasks', 'Archived Tasks'];
 
   void changeIndex(int index) {
     currentIndex = index;
@@ -47,7 +38,7 @@ class TasksCubit extends Cubit<TasksState> {
             });
       },
       onOpen: (database) {
-        GetDataFromDatabase(database);
+        getDataFromDatabase(database);
         print('Database opened');
       },
     ).then((value) {
@@ -69,7 +60,7 @@ class TasksCubit extends Cubit<TasksState> {
           .then((value) {
             emit(InsertTaskState());
             print("$value inserted successfully");
-            GetDataFromDatabase(database);
+            getDataFromDatabase(database);
           })
           .catchError((error) {
             print("Error when inserting new record ${error.toString()}");
@@ -78,12 +69,13 @@ class TasksCubit extends Cubit<TasksState> {
     });
   }
 
-  void GetDataFromDatabase(database) {
+  void getDataFromDatabase(Database database) {
     newtasks = [];
     donetasks = [];
     archivedtasks = [];
+    emit(GetLoadingTasksState());
     database.rawQuery('SELECT * FROM tasks').then((value) {
-      value.forEach((element) {
+      for (final element in value) {
         if (element['status'] == 'new') {
           newtasks.add(element);
         } else if (element['status'] == 'done') {
@@ -91,7 +83,7 @@ class TasksCubit extends Cubit<TasksState> {
         } else if (element['status'] == 'archived') {
           archivedtasks.add(element);
         }
-      });
+      }
       emit(GetTasksState());
     });
   }
@@ -100,9 +92,16 @@ class TasksCubit extends Cubit<TasksState> {
     database
         .rawUpdate('UPDATE tasks SET status = ? WHERE id = ?', ['$status', id])
         .then((value) {
-          GetDataFromDatabase(database);
+          getDataFromDatabase(database);
           emit(UpdateTasksState());
         });
+  }
+
+  void deleteTask({required int id}) async {
+    database.rawDelete('DELETE FROM tasks WHERE id = ?', [id]).then((value) {
+      getDataFromDatabase(database);
+      emit(DeleteTasksState());
+    });
   }
 
   bool isBottomSheetShown = false;

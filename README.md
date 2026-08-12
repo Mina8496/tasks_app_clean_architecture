@@ -1,20 +1,12 @@
 # Tasks App — Clean Architecture
 
-A Flutter Tasks application built with **Clean Architecture** and **BLoC**, designed to demonstrate scalable Flutter development, local data persistence, REST API integration, search functionality, WebView integration, and API testing.
+A Flutter Tasks application built with **Clean Architecture** and **BLoC**, designed to demonstrate scalable Flutter development, local data persistence.
 
 ## Features
 
 * Task management UI
-* Clean Architecture
 * BLoC / Cubit state management
 * SQLite local database using `sqflite`
-* REST API integration
-* API testing and debugging with Postman
-* SharedPreferences for local preferences
-* Task search
-* WebView integration
-* Loading and error states
-* Separation of presentation, domain, and data layers
 * Reusable Flutter widgets
 * Responsive and clean UI
 
@@ -25,43 +17,17 @@ A Flutter Tasks application built with **Clean Architecture** and **BLoC**, desi
 | Flutter            | Application framework   |
 | Dart               | Programming language    |
 | BLoC               | State management        |
-| Clean Architecture | Project architecture    |
 | Sqflite            | Local SQLite database   |
-| REST API           | Remote data             |
-| SharedPreferences  | Local preferences       |
-| WebView            | Web content integration |
-| Postman            | API testing             |
-| HTTP/Dio           | API communication       |
+
 
 ## Architecture
 
-The project follows **Clean Architecture** to separate the application into independent layers:
 
 ```text
 lib/
 │
-├── core/
-│   ├── constants/
-│   ├── errors/
-│   ├── network/
-│   ├── utils/
-│   └── widgets/
-│
-├── data/
-│   ├── datasources/
-│   │   ├── local/
-│   │   └── remote/
-│   │
-│   ├── models/
-│   └── repositories/
-│
-├── domain/
-│   ├── entities/
-│   ├── repositories/
-│   └── usecases/
-│
 ├── presentation/
-│   ├── bloc/
+│   ├── cubit/
 │   ├── pages/
 │   └── widgets/
 │
@@ -74,7 +40,7 @@ Responsible for the UI and state management.
 
 ```text
 presentation/
-├── bloc/
+├── cubit/
 ├── pages/
 └── widgets/
 ```
@@ -88,19 +54,6 @@ domain/
 ├── entities/
 ├── repositories/
 └── usecases/
-```
-
-### Data Layer
-
-Responsible for communicating with external and local data sources.
-
-```text
-data/
-├── datasources/
-│   ├── local/
-│   └── remote/
-├── models/
-└── repositories/
 ```
 
 ## Local Database
@@ -121,65 +74,6 @@ Task
 
 The repository pattern is used to keep database implementation separate from the application business logic.
 
-## API Integration
-
-The project demonstrates working with REST APIs.
-
-The API flow is structured as:
-
-```text
-UI
- ↓
-BLoC
- ↓
-Use Case
- ↓
-Repository
- ↓
-Remote Data Source
- ↓
-REST API
-```
-
-API requests and responses are tested using **Postman** before being integrated into the Flutter application.
-
-## Search
-
-The application includes task search functionality.
-
-Users can search through their tasks and filter the displayed results based on the entered search query.
-
-```text
-Search Query
-     ↓
-   BLoC
-     ↓
-Filter Tasks
-     ↓
-Updated UI
-```
-
-## SharedPreferences
-
-`SharedPreferences` is used for storing lightweight local information such as:
-
-* User preferences
-* First-launch state
-* Application settings
-* Simple local flags
-
-It is not used as the primary database for tasks; task persistence is handled through SQLite.
-
-## WebView
-
-The application also demonstrates WebView integration for displaying web content inside the Flutter application.
-
-Possible use cases include:
-
-* Opening web pages
-* Displaying online content
-* Loading API-related web pages
-* In-app browser functionality
 
 ## State Management
 
@@ -197,17 +91,7 @@ Empty
 
 This keeps business logic outside the UI and makes the application easier to maintain and test.
 
-## Error Handling
 
-The application handles common situations such as:
-
-* API errors
-* Network failures
-* Empty responses
-* Database errors
-* Invalid API responses
-* Loading states
-* Empty task lists
 
 ## Getting Started
 
@@ -235,17 +119,6 @@ flutter pub get
 flutter run
 ```
 
-## API Configuration
-
-If the project uses an external API, configure the API base URL and required credentials according to the project configuration.
-
-Example:
-
-```dart
-const String baseUrl = 'YOUR_API_BASE_URL';
-```
-
-Do not commit private API keys or sensitive credentials to GitHub.
 
 ## Packages
 
@@ -259,10 +132,7 @@ dependencies:
   flutter_bloc:
   equatable:
   sqflite:
-  shared_preferences:
-  dio:
-  webview_flutter:
-  path:
+  
 ```
 
 Run:
@@ -281,26 +151,9 @@ This project was created to demonstrate practical Flutter development using:
 * BLoC
 * Repository Pattern
 * Local database management
-* REST API integration
-* API testing with Postman
-* Search functionality
-* WebView
-* Local preferences
 * Error handling
 * Scalable project structure
 
-## Future Improvements
-
-* User authentication
-* Firebase integration
-* Push notifications
-* Task reminders
-* Dark mode
-* Advanced task filtering
-* Unit testing
-* Widget testing
-* CI/CD
-* Offline-first synchronization
 
 ## Author
 

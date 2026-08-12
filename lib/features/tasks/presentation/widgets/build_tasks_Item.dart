@@ -7,57 +7,63 @@ class BuildTasksItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(15.0),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 40,
-            backgroundColor: Colors.blue,
-            child: Text(
-              '${tasks['time']}',
-              style: TextStyle(color: Colors.white),
+    return Dismissible(
+      key: Key(tasks['id'].toString()),
+      onDismissed: (direction) {
+        TasksCubit.get(context).deleteTask(id: tasks['id']);
+      },
+      child: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Row( 
+          children: [
+            CircleAvatar(
+              radius: 40,
+              backgroundColor: Colors.blue,
+              child: Text(
+                '${tasks['time']}',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
-          ),
-          SizedBox(width: 20),
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${tasks['title']}',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+            SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${tasks['title']}',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                Text(
-                  '${tasks['data']}',
-                  style: TextStyle(color: Colors.grey, fontSize: 16),
-                ),
-                SizedBox(width: 20),
-              ],
+                  Text(
+                    '${tasks['data']}',
+                    style: TextStyle(color: Colors.grey, fontSize: 16),
+                  ),
+                  SizedBox(width: 20),
+                ],
+              ),
             ),
-          ),
-          IconButton(
-            onPressed: () {
-              TasksCubit.get(
-                context,
-              ).updateData(status: 'done', id: tasks['id']);
-            },
-            icon: Icon(Icons.check_box, color: Colors.green),
-          ),
-          IconButton(
-            onPressed: () {
-              TasksCubit.get(
-                context,
-              ).updateData(status: 'archived', id: tasks['id']);
-            },
-            icon: Icon(Icons.archive, color: Colors.black45),
-          ),
-        ],
+            IconButton(
+              onPressed: () {
+                TasksCubit.get(
+                  context,
+                ).updateData(status: 'done', id: tasks['id']);
+              },
+              icon: Icon(Icons.check_box, color: Colors.green),
+            ),
+            IconButton(
+              onPressed: () {
+                TasksCubit.get(
+                  context,
+                ).updateData(status: 'archived', id: tasks['id']);
+              },
+              icon: Icon(Icons.archive, color: Colors.black45),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -4,13 +4,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:tasks_app_clean_architecture/features/tasks/presentation/cubit/tasks_cubit.dart';
 import 'package:tasks_app_clean_architecture/features/tasks/presentation/cubit/tasks_state.dart';
+import 'package:tasks_app_clean_architecture/features/tasks/presentation/pages/New_Tasks_page.dart';
+import 'package:tasks_app_clean_architecture/features/tasks/presentation/pages/archived_tasks_page.dart';
+import 'package:tasks_app_clean_architecture/features/tasks/presentation/pages/done_tasks_page.dart';
 import 'package:tasks_app_clean_architecture/features/tasks/presentation/widgets/default_From_Text_Feild.dart';
 
+// ignore: must_be_immutable
 class TasksHomePage extends StatelessWidget {
   TasksHomePage({super.key});
 
   var scaffoldKey = GlobalKey<ScaffoldState>();
   var formKey = GlobalKey<FormState>();
+
+  List<Widget> screens = [NewTasksPage(), DoneTasksPage(), ArchivedTasksPage()];
+
+  List<String> titles = ['New Tasks', 'Done Tasks', 'Archived Tasks'];
 
   var titleController = TextEditingController();
   var dataController = TextEditingController();
@@ -40,9 +48,7 @@ class TasksHomePage extends StatelessWidget {
               centerTitle: false,
 
               title: Text(
-                TasksCubit.get(context).titles[TasksCubit.get(
-                  context,
-                ).currentIndex],
+                titles[TasksCubit.get(context).currentIndex],
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 23,
@@ -55,10 +61,10 @@ class TasksHomePage extends StatelessWidget {
             // BODY
             // --------------------------------------------------
             body: ConditionalBuilder(
-              condition: TasksCubit.get(context).newtasks.isNotEmpty,
-              builder: (context) => TasksCubit.get(
-                context,
-              ).screens[TasksCubit.get(context).currentIndex],
+              condition: state is! GetLoadingTasksState,
+              builder: (context) =>
+                  screens[TasksCubit.get(context).currentIndex],
+
               fallback: (context) =>
                   const Center(child: CircularProgressIndicator()),
             ),

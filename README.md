@@ -23,7 +23,7 @@ A Flutter Tasks application built with **Clean Architecture** and **BLoC**, desi
 
 > Add screenshots here after running the project.
 
-
+|  |  |  |
 |------|---------|----------|
 | ![](screenShots/1.jpg) | ![](screenShots/2.jpg) | ![](screenShots/3.jpg) |
 | ![](screenShots/4.jpg) | ![](screenShots/5.jpg) | ![](screenShots/6.jpg) |

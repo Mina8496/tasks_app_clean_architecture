@@ -1,4 +1,4 @@
-# Tasks App — Clean Architecture
+# Tasks App 
 
 A Flutter Tasks application built with **Clean Architecture** and **BLoC**, designed to demonstrate scalable Flutter development, local data persistence.
 
